@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: rgb(248, 229, 204);
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Student feedback Dashboard</h1>
+    <div style="display: flex; justify-content: space-between; padding: 10px 20px;">
+        <div id="feedback">
+            loading your feedbacks...
+        </div>
+        <div>
+            <input type="text" id="userFeedback" placeholder="Enter your feedback">
+            <button id="submitFeedback" onclick="addFeedback()">Submit Feedback</button>
+        </div>
+    </div>
+
+    <script>
+        async function addFeedback() {
+            const req = await axios.post('/feedback', {
+                feedback: document.getElementById('userFeedback').value
+            },{
+                headers:{
+                    token: localStorage.getItem('token')
+                }
+            })
+
+            const newFeedback = document.createElement('div');
+
+            newFeedback.innerHTML = document.getElementById('userFeedback').value;
+            newFeedback.setAttribute('style', 'border: 1px solid black; padding: 10px; margin: 10px;');
+            document.getElementById('feedback').appendChild(newFeedback);
+
+            document.getElementById('userFeedback').value = '';        
+        }
+
+        async function getFeedbacks(){
+            const res = await axios.get('/feedback', {
+                headers: {
+                    token: localStorage.getItem('token')
+                }
+            });
+
+            const feedbacks = res.data;
+            console.log(feedbacks);
+
+            document.getElementById('feedback').innerHTML = '';
+            for(let i=0; i<feedbacks.length; i++){
+                const feedback = document.createElement('div');
+                feedback.innerHTML = feedbacks[i].feedback;
+                feedback.setAttribute('style', 'border: 2px solid black; padding: 10px; margin: 10px;');
+                document.getElementById('feedback').appendChild(feedback);
+            }
+        }
+
+        getFeedbacks();
+    </script>
+</body>
+</html>
