@@ -1,70 +1,925 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dashboard</title>
+    <title>Student Feedback Dashboard</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            /* Light Theme Variables */
+            --bg-color: #f8fafc;
+            --bg-gradient: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                           radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+            --header-bg: rgba(255, 255, 255, 0.75);
+            --header-border: rgba(99, 102, 241, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-border: rgba(99, 102, 241, 0.1);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: #e2e8f0;
+            --input-focus-border: #6366f1;
+            --sidebar-bg: rgba(255, 255, 255, 0.6);
+            --shadow-color: rgba(99, 102, 241, 0.06);
+            --card-shadow: 0 10px 30px -10px var(--shadow-color);
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --info-color: #3b82f6;
+            --scrollbar-thumb: #cbd5e1;
+            --scrollbar-track: #f1f5f9;
+        }
+
+        :root[data-theme="dark"] {
+            /* Dark Theme Variables */
+            --bg-color: #0b0f19;
+            --bg-gradient: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
+                           radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.12) 0%, transparent 45%);
+            --header-bg: rgba(20, 26, 45, 0.75);
+            --header-border: rgba(255, 255, 255, 0.05);
+            --card-bg: rgba(20, 26, 45, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --input-bg: rgba(11, 15, 25, 0.8);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --sidebar-bg: rgba(20, 26, 45, 0.6);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --card-shadow: 0 15px 35px -10px var(--shadow-color);
+            --scrollbar-thumb: #334155;
+            --scrollbar-track: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: rgb(248, 229, 204);
-        }
-    </style>
-
-</head>
-<body>
-    <h1>Student feedback Dashboard</h1>
-    <div style="display: flex; justify-content: space-between; padding: 10px 20px;">
-        <div id="feedback">
-            loading your feedbacks...
-        </div>
-        <div>
-            <input type="text" id="userFeedback" placeholder="Enter your feedback">
-            <button id="submitFeedback" onclick="addFeedback()">Submit Feedback</button>
-        </div>
-    </div>
-
-    <script>
-        async function addFeedback() {
-            const req = await axios.post('/feedback', {
-                feedback: document.getElementById('userFeedback').value
-            },{
-                headers:{
-                    token: localStorage.getItem('token')
-                }
-            })
-
-            const newFeedback = document.createElement('div');
-
-            newFeedback.innerHTML = document.getElementById('userFeedback').value;
-            newFeedback.setAttribute('style', 'border: 1px solid black; padding: 10px; margin: 10px;');
-            document.getElementById('feedback').appendChild(newFeedback);
-
-            document.getElementById('userFeedback').value = '';        
+            font-family: 'Outfit', sans-serif;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
-        async function getFeedbacks(){
-            const res = await axios.get('/feedback', {
-                headers: {
-                    token: localStorage.getItem('token')
-                }
-            });
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
 
-            const feedbacks = res.data;
-            console.log(feedbacks);
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-primary);
+        }
 
-            document.getElementById('feedback').innerHTML = '';
-            for(let i=0; i<feedbacks.length; i++){
-                const feedback = document.createElement('div');
-                feedback.innerHTML = feedbacks[i].feedback;
-                feedback.setAttribute('style', 'border: 2px solid black; padding: 10px; margin: 10px;');
-                document.getElementById('feedback').appendChild(feedback);
+        /* Header Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--header-border);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(99, 102, 241, 0.08);
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .user-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .btn-icon:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--card-border);
+            transform: scale(1.05);
+        }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid var(--input-border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--error-color);
+            color: var(--error-color);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        /* Main Container Layout */
+        main {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 40px;
+        }
+
+        /* Left Side: Submit Panel */
+        .submit-section {
+            background: var(--sidebar-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 100px;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .section-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            resize: none;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 15px -5px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -5px rgba(99, 102, 241, 0.6);
+            filter: brightness(1.1);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Right Side: Feedbacks Feed */
+        .feed-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Search Bar & Filters */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            position: relative;
+            max-width: 320px;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border-radius: 50px;
+            border: 1px solid var(--input-border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .count-badge {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-primary);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Feed container */
+        .feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 200px;
+        }
+
+        /* Feedback Card */
+        .feedback-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-username {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .card-timestamp {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .card-body {
+            font-size: 0.98rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            overflow-wrap: break-word;
+            text-wrap: pretty;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+            text-align: center;
+            background: var(--card-bg);
+            border: 2px dashed var(--input-border);
+            border-radius: 16px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            opacity: 0.4;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .empty-desc {
+            font-size: 0.9rem;
+            max-width: 300px;
+        }
+
+        /* Loading Skeletons */
+        .skeleton-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .skeleton-line {
+            height: 16px;
+            background: linear-gradient(90deg, var(--input-border) 25%, var(--scrollbar-track) 50%, var(--input-border) 75%);
+            background-size: 200% 100%;
+            animation: loadingPulse 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        .skeleton-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--input-border);
+            animation: loadingPulse 1.5s infinite;
+        }
+
+        @keyframes loadingPulse {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Spinner for loading inside buttons */
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s infinite linear;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast notifications styling */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 14px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            pointer-events: auto;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toast::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .toast.success::before { background: var(--success-color); }
+        .toast.error::before { background: var(--error-color); }
+        .toast.info::before { background: var(--info-color); }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            font-size: 1.1rem;
+        }
+        .toast.success .toast-icon { color: var(--success-color); }
+        .toast.error .toast-icon { color: var(--error-color); }
+        .toast.info .toast-icon { color: var(--info-color); }
+
+        .toast-msg {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+                padding: 24px;
+                gap: 24px;
+            }
+            .submit-section {
+                position: static;
+            }
+            header {
+                padding: 16px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-section">
+            <i class="fa-solid fa-comments logo-icon"></i>
+            <span class="logo-text">FeedbackApp</span>
+        </div>
+        <div class="user-controls">
+            <div class="user-profile">
+                <div id="userAvatar" class="user-avatar">S</div>
+                <span id="headerUsername" class="user-name">Student</span>
+            </div>
+            <button id="themeToggle" class="btn-icon" onclick="toggleTheme()" aria-label="Toggle theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Sign Out</span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Left Column: Submit form -->
+        <section class="submit-section">
+            <h2 class="section-title">Submit Feedback</h2>
+            <p class="section-desc">Share your anonymous feedback or suggestions directly with the staff.</p>
+
+            <form id="feedbackForm" onsubmit="event.preventDefault(); addFeedback();">
+                <div class="form-group">
+                    <div class="textarea-wrapper">
+                        <textarea id="userFeedback" placeholder="Write your thoughts here..." required maxlength="300"></textarea>
+                    </div>
+                    <div id="charCounter" class="char-counter">0 / 300</div>
+                </div>
+
+                <button type="submit" id="submitFeedback" class="btn-submit">
+                    <span>Submit Feedback</span>
+                    <div id="spinner" class="spinner"></div>
+                </button>
+            </form>
+        </section>
+
+        <!-- Right Column: Feedbacks list -->
+        <section class="feed-section">
+            <div class="feed-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <h2 class="section-title" style="margin-bottom: 0;">My Feedback</h2>
+                    <span id="feedbackCount" class="count-badge">0 total</span>
+                </div>
+
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search feedback..." oninput="filterFeedbacks()">
+                </div>
+            </div>
+
+            <div id="feedback" class="feed-container">
+                <!-- Skeletons render during data fetching -->
+                <div class="skeleton-card">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <div class="skeleton-avatar"></div>
+                        <div class="skeleton-line" style="width: 100px;"></div>
+                    </div>
+                    <div class="skeleton-line" style="width: 100%;"></div>
+                    <div class="skeleton-line" style="width: 80%;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        // Check for authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location = '/signin';
+        }
+
+        // Setup Axios interceptor to handle authorization expiration
+        axios.interceptors.response.use(
+            response => response,
+            error => {
+                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                    localStorage.removeItem('token');
+                    window.location = '/signin';
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        // State variables
+        let feedbacksState = [];
+        let theme = localStorage.getItem('theme') || 'light';
+
+        // Initialize theme
+        document.documentElement.setAttribute('data-theme', theme);
+        updateThemeIcon();
+
+        function toggleTheme() {
+            theme = theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.querySelector('#themeToggle i');
+            if (theme === 'dark') {
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+            }
+        }
+
+        // Decode username from JWT token safely
+        function getUsernameFromToken() {
+            if (!token) return 'Student';
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload).username || 'Student';
+            } catch (e) {
+                return 'Student';
+            }
+        }
+
+        // Generate consistent colors for users
+        function stringToHslColor(str, s, l) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const h = Math.abs(hash) % 360;
+            return `hsl(${h}, ${s}%, ${l}%)`;
+        }
+
+        // Onboarding / Profile setup
+        const currentUsername = getUsernameFromToken();
+        document.getElementById('headerUsername').textContent = currentUsername;
+        const avatarEl = document.getElementById('userAvatar');
+        avatarEl.textContent = currentUsername.charAt(0).toUpperCase();
+        avatarEl.style.backgroundColor = stringToHslColor(currentUsername, 60, 50);
+
+        // Textarea counter
+        const feedbackInput = document.getElementById('userFeedback');
+        const charCounter = document.getElementById('charCounter');
+        feedbackInput.addEventListener('input', () => {
+            const count = feedbackInput.value.length;
+            charCounter.textContent = `${count} / 300`;
+            if (count >= 280) {
+                charCounter.style.color = 'var(--error-color)';
+            } else {
+                charCounter.style.color = 'var(--text-muted)';
+            }
+        });
+
+        // Toast Messages
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let iconClass = 'fa-circle-check';
+            if (type === 'error') iconClass = 'fa-triangle-exclamation';
+            if (type === 'info') iconClass = 'fa-circle-info';
+
+            toast.innerHTML = `
+                <i class="fa-solid ${iconClass} toast-icon"></i>
+                <span class="toast-msg">${message}</span>
+            `;
+
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Remove after duration
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
+        }
+
+        // Sign out
+        function logout() {
+            localStorage.removeItem('token');
+            window.location = '/signin';
+        }
+
+        // Create HTML feedback card
+        function createFeedbackCard(feedbackText, author) {
+            const card = document.createElement('div');
+            card.className = 'feedback-card';
+            
+            const userLetter = author.charAt(0).toUpperCase();
+            const avatarBg = stringToHslColor(author, 60, 50);
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-user-info">
+                        <div class="card-avatar" style="background-color: ${avatarBg}">${userLetter}</div>
+                        <span class="card-username">${author}</span>
+                    </div>
+                    <span class="card-timestamp">Just now</span>
+                </div>
+                <p class="card-body">${feedbackText}</p>
+            `;
+            return card;
+        }
+
+        // Fetch all feedbacks
+        async function getFeedbacks() {
+            const feedContainer = document.getElementById('feedback');
+            try {
+                const res = await axios.get('/feedback', {
+                    headers: { token }
+                });
+
+                feedbacksState = res.data;
+                renderFeedbacks(feedbacksState);
+            } catch (error) {
+                console.error("Error fetching feedbacks:", error);
+                showToast("Failed to load feedbacks.", "error");
+            }
+        }
+
+        // Render feedbacks array to DOM
+        function renderFeedbacks(feedbacksList) {
+            const feedContainer = document.getElementById('feedback');
+            const countBadge = document.getElementById('feedbackCount');
+            
+            feedContainer.innerHTML = '';
+            countBadge.textContent = `${feedbacksList.length} total`;
+
+            if (feedbacksList.length === 0) {
+                const isSearching = document.getElementById('searchInput').value.trim() !== '';
+                feedContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-box-open empty-icon"></i>
+                        <h3 class="empty-title">${isSearching ? 'No Search Results' : 'No Feedback Yet'}</h3>
+                        <p class="empty-desc">${isSearching ? 'Try typing something else in the search field.' : 'Submit your first feedback using the form on the left.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Loop backwards to show newest feedbacks first
+            for (let i = feedbacksList.length - 1; i >= 0; i--) {
+                const card = createFeedbackCard(feedbacksList[i].feedback, feedbacksList[i].username);
+                feedContainer.appendChild(card);
+            }
+        }
+
+        // Filter feedbacks based on search input
+        function filterFeedbacks() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (!query) {
+                renderFeedbacks(feedbacksState);
+                return;
+            }
+
+            const filtered = feedbacksState.filter(item => 
+                item.feedback.toLowerCase().includes(query) || 
+                item.username.toLowerCase().includes(query)
+            );
+            renderFeedbacks(filtered);
+        }
+
+        // Submit new feedback
+        async function addFeedback() {
+            const submitBtn = document.getElementById('submitFeedback');
+            const spinner = document.getElementById('spinner');
+            const inputVal = feedbackInput.value.trim();
+
+            if (!inputVal) {
+                showToast("Feedback content cannot be empty.", "error");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            spinner.style.display = "block";
+
+            try {
+                const res = await axios.post('/feedback', {
+                    feedback: inputVal
+                }, {
+                    headers: { token }
+                });
+
+                showToast("Feedback submitted successfully!", "success");
+
+                // Clear input
+                feedbackInput.value = '';
+                charCounter.textContent = '0 / 300';
+                charCounter.style.color = 'var(--text-muted)';
+
+                // Update state and re-render
+                // We add it locally to prevent full reloading if we want, or refetch
+                feedbacksState.push({
+                    username: currentUsername,
+                    feedback: inputVal
+                });
+                
+                // Clear search and render updated list
+                document.getElementById('searchInput').value = '';
+                renderFeedbacks(feedbacksState);
+
+            } catch (error) {
+                console.error("Submission error:", error);
+                showToast("Failed to submit feedback. Try again.", "error");
+            } finally {
+                submitBtn.disabled = false;
+                spinner.style.display = "none";
+            }
+        }
+
+        // Initial fetch
         getFeedbacks();
     </script>
 </body>
