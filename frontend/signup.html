@@ -23,6 +23,7 @@
             --accent-primary: #6366f1;
             --accent-secondary: #8b5cf6;
             --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --hero-gradient: linear-gradient(135deg, #4f46e5, #7c3aed);
             --input-bg: rgba(15, 23, 42, 0.6);
             --input-border: rgba(255, 255, 255, 0.1);
             --input-focus-border: #6366f1;
@@ -38,59 +39,193 @@
         }
 
         body {
-            background: var(--bg-gradient);
+            background-color: #0f172a;
             min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Split-screen wrapper */
+        .signup-wrapper {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Left side: Hero Column */
+        .signup-hero {
+            background: var(--hero-gradient);
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Glow effects for Hero background */
+        .hero-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            filter: blur(100px);
+            top: -10%;
+            right: -10%;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 520px;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 40px;
+        }
+
+        /* Feature items */
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin-bottom: 40px;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            color: var(--text-primary);
-            overflow: hidden;
-            position: relative;
+            font-size: 1.2rem;
+            color: #ffffff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
-        /* Ambient Animated Blobs */
+        .feature-text h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .feature-text p {
+            font-size: 0.92rem;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.4;
+        }
+
+        /* Quote box */
+        .quote-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: auto;
+        }
+
+        .quote-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #ffffff;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .quote-author {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            display: block;
+        }
+
+        /* Right side: Form Column */
+        .signup-form-section {
+            background: var(--bg-gradient);
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Form Background Blobs */
         .blob {
             position: absolute;
-            width: 300px;
-            height: 300px;
+            width: 260px;
+            height: 260px;
             border-radius: 50%;
             filter: blur(80px);
             z-index: 0;
-            opacity: 0.5;
+            opacity: 0.4;
             animation: float 12s infinite alternate ease-in-out;
         }
         .blob-1 {
             background: var(--accent-primary);
-            top: -10%;
-            left: -10%;
+            top: 10%;
+            left: 10%;
         }
         .blob-2 {
             background: var(--accent-secondary);
-            bottom: -10%;
-            right: -10%;
+            bottom: 10%;
+            right: 10%;
             animation-delay: -6s;
         }
 
         @keyframes float {
             0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 30px) scale(1.2); }
+            100% { transform: translate(30px, 20px) scale(1.15); }
         }
 
         /* Glassmorphic Container */
         .auth-container {
             width: 100%;
-            max-width: 440px;
+            max-width: 420px;
             background: var(--card-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--card-border);
             border-radius: 24px;
             padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
             z-index: 10;
             position: relative;
-            transform: translateY(20px);
+            transform: translateY(15px);
             opacity: 0;
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
@@ -103,23 +238,22 @@
         }
 
         .auth-header {
-            text-align: center;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
 
         .auth-logo {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             display: inline-block;
         }
 
         .auth-subtitle {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 400;
         }
 
@@ -151,7 +285,7 @@
             border: 1px solid var(--input-border);
             border-radius: 12px;
             color: var(--text-primary);
-            font-size: 1rem;
+            font-size: 0.98rem;
             font-weight: 400;
             outline: none;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -170,7 +304,7 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-secondary);
-            font-size: 1rem;
+            font-size: 0.98rem;
             pointer-events: none;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -179,7 +313,7 @@
         .auth-input:not(:placeholder-shown) ~ .floating-label {
             top: 0;
             left: 12px;
-            transform: translateY(-50%) scale(0.85);
+            transform: translateY(-50%) scale(0.82);
             background: #151e33;
             padding: 2px 8px;
             color: var(--accent-primary);
@@ -313,49 +447,119 @@
             25% { transform: translateX(-6px); }
             75% { transform: translateX(6px); }
         }
+
+        /* Responsive styling */
+        @media (max-width: 900px) {
+            .signup-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .signup-hero {
+                display: none;
+            }
+            .signup-form-section {
+                padding: 24px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
 
-    <div class="auth-container">
-        <div class="auth-header">
-            <h1 class="auth-logo">FeedbackApp</h1>
-            <p class="auth-subtitle">Create your student account to get started</p>
-        </div>
+    <div class="signup-wrapper">
+        <!-- Left Side: Interactive Hero Section -->
+        <div class="signup-hero">
+            <div class="hero-glow"></div>
+            <div class="hero-content">
+                <div>
+                    <h2 class="hero-title">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>FeedbackApp</span>
+                    </h2>
+                    <p class="hero-subtitle">Elevating academic environments by amplifying student voices anonymously and securely.</p>
+                </div>
 
-        <div id="alertMessage" class="alert-message">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <span id="alertText">An error occurred</span>
-        </div>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-user-secret"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>100% Anonymous Submissions</h4>
+                            <p>Express suggestions, queries, or critiques with complete privacy safeguards.</p>
+                        </div>
+                    </div>
 
-        <form id="signupForm" onsubmit="event.preventDefault(); signup();">
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-user input-icon"></i>
-                    <input type="text" id="username" class="auth-input" placeholder=" " required autocomplete="username">
-                    <label for="username" class="floating-label">Username</label>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Real-Time Board Sync</h4>
+                            <p>Deliver feedback instantly, feeding directly into the live faculty dashboard view.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-square-poll-vertical"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4>Dashboard Management</h4>
+                            <p>Filter, search, and navigate feedback efficiently through a gorgeous UI.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quote-card">
+                    <p class="quote-text">"Creating platforms that foster transparency and communication is the key to building successful classrooms."</p>
+                    <span class="quote-author">— Student Advisory Council</span>
                 </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <i class="fa-solid fa-lock input-icon"></i>
-                    <input type="password" id="password" class="auth-input" placeholder=" " required autocomplete="new-password">
-                    <label for="password" class="floating-label">Password</label>
-                    <i class="fa-solid fa-eye password-toggle" onclick="togglePasswordVisibility()"></i>
+        <!-- Right Side: Clean Centered Signup Card -->
+        <div class="signup-form-section">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+
+            <div class="auth-container">
+                <div class="auth-header">
+                    <h1 class="auth-logo">Create Account</h1>
+                    <p class="auth-subtitle">Sign up below to access your dashboard</p>
+                </div>
+
+                <div id="alertMessage" class="alert-message">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="alertText">An error occurred</span>
+                </div>
+
+                <form id="signupForm" onsubmit="event.preventDefault(); signup();">
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user input-icon"></i>
+                            <input type="text" id="username" class="auth-input" placeholder=" " required autocomplete="username">
+                            <label for="username" class="floating-label">Username</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input type="password" id="password" class="auth-input" placeholder=" " required autocomplete="new-password">
+                            <label for="password" class="floating-label">Password</label>
+                            <i class="fa-solid fa-eye password-toggle" onclick="togglePasswordVisibility()"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="signupBtn" class="btn-submit">
+                        <span>Sign Up</span>
+                        <div id="spinner" class="spinner"></div>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="/signin" class="auth-link">Sign In</a>
                 </div>
             </div>
-
-            <button type="submit" id="signupBtn" class="btn-submit">
-                <span>Sign Up</span>
-                <div id="spinner" class="spinner"></div>
-            </button>
-        </form>
-
-        <div class="auth-footer">
-            Already have an account? <a href="/signin" class="auth-link">Sign In</a>
         </div>
     </div>
 
